@@ -1,5 +1,6 @@
 package com.starweather.android;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.starweather.android.gson.Forecast;
 import com.starweather.android.gson.Weather;
+import com.starweather.android.service.AutoUpdateService;
 import com.starweather.android.util.HttpUtil;
 import com.starweather.android.util.Utility;
 
@@ -139,6 +141,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     public void requestWeather(final String weatherId)
     {
+        Log.d("qqqqq", "weatherId: "+weatherId);
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=dab79a5bbf2f4dc3a70fab268145afed";
                 HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
@@ -147,7 +150,6 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("Runnable：onFailure ", "出错出错出错出错出错出错 ");
                         Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -167,10 +169,10 @@ public class WeatherActivity extends AppCompatActivity {
                             editor.putString("weather",responseText);
                             editor.apply();
                             showWeatherInfo(weather);
+
                         }
                         else
                         {
-                            Log.d("onResponse", "if判断分支   weatherId =  "+weatherId+"    "+responseText);
                             Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
                         }
                         swipeRefreshLayout.setRefreshing(false);
@@ -216,5 +218,7 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText.setText(carwash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this,AutoUpdateService.class);
+        startService(intent);
     }
 }
